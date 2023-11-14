@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -91,6 +91,7 @@ namespace Clipboard_LLM
         {
             notifyIcon1.Icon = Properties.Resources.icon_nocolor;
             string text = Clipboard.GetText();
+            Debug.WriteLine($"Clipboard text: {text}");
             string lang = "en";
             try
             {
@@ -124,9 +125,18 @@ namespace Clipboard_LLM
             try
             {
                 string answer = await Palm2.GetAnswer(text);
+                Debug.WriteLine($"Answer {answer}");
                 string code = ExtractCode(answer);
-                answer.Replace(code, "");
-                answer = Translator.translate(answer, "en", "ko");
+                if(code.Length > 0)
+                    answer.Replace(code, "");
+                try
+                {
+                    answer = Translator.translate(answer, "en", "ko");
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
                 Debug.WriteLine($"Answer {answer}");
                 Clipboard.SetText(answer);
                 if (code.Length > 0)
